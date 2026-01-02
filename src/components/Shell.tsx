@@ -61,7 +61,7 @@ export function Shell() {
     color: COLORS[idx % COLORS.length],
   }));
 
-  const dashUrl = `http://localhost:8050/?signal_id=${signalsParam}&signals=${encodeURIComponent(
+  const dashUrl = `https://main-dash-app.onrender.com/?signal_id=${signalsParam}&signals=${encodeURIComponent(
     JSON.stringify(signalsMetadata)
   )}&live=${isLive}&start=${encodeURIComponent(
     dateRange.start
