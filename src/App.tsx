@@ -1,5 +1,7 @@
+import { Shell } from "./components/Shell";
+
 function App() {
-  return <h1>Hello, World!</h1>;
+  return <Shell />;
 }
 
 export default App;
