@@ -3,6 +3,7 @@ import { useGraphql } from "../hooks/useGraphQL";
 import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
 import { BottomPanel } from "./BottomPanel";
+import { CollapsibleBottomPanel } from "./CollapsibleBottomPanel";
 import type { GetSignalsData } from "@/types";
 import { ChartArea } from "./ChartArea";
 
@@ -47,14 +48,11 @@ export function Shell() {
 
   // Build URL with signal IDs and metadata (including colors)
   const COLORS = [
-    "#2563eb",
-    "#dc2626",
-    "#16a34a",
-    "#d97706",
-    "#8b5cf6",
-    "#ec4899",
-    "#06b6d4",
-    "#f59e0b",
+    "#3b82f6", // chart-1: Blue
+    "#a855f7", // chart-2: Purple
+    "#0ea5e9", // chart-3: Cyan
+    "#10b981", // chart-4: Emerald/Teal
+    "#f59e0b", // chart-5: Amber
   ];
   const signalsParam = activeSignalIds.join(",");
   const signalsMetadata = selectedSignals.map((s, idx) => ({
@@ -70,7 +68,7 @@ export function Shell() {
   )}&end=${encodeURIComponent(dateRange.end)}`;
 
   return (
-    <div className="flex h-screen bg-zinc-50 font-sans text-zinc-900 overflow-hidden">
+    <div className="flex h-screen bg-background font-sans text-foreground overflow-hidden">
       {/* LEFT: Sidebar */}
       <Sidebar
         signals={data?.getSignals || []}
@@ -95,13 +93,15 @@ export function Shell() {
           hasSignalsSelected={activeSignalIds.length > 0}
         />
 
-        {/* BOTTOM: Timeline & Legend */}
-        <BottomPanel
-          dateRange={dateRange}
-          isLive={isLive}
-          selectedSignals={selectedSignals}
-          onSetDateRange={setDateRange}
-        />
+        {/* BOTTOM: Timeline & Legend (Collapsible) */}
+        <CollapsibleBottomPanel title="Timeline & Legend" defaultOpen={true}>
+          <BottomPanel
+            dateRange={dateRange}
+            isLive={isLive}
+            selectedSignals={selectedSignals}
+            onSetDateRange={setDateRange}
+          />
+        </CollapsibleBottomPanel>
       </main>
     </div>
   );

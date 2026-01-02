@@ -14,8 +14,8 @@ export function ChartArea({
   hasSignalsSelected,
 }: Readonly<ChartAreaProps>) {
   return (
-    <div className="flex-1 bg-zinc-100 p-4 relative min-h-0">
-      <div className="w-full h-full bg-white rounded-lg border border-zinc-200 shadow-sm overflow-hidden">
+    <div className="flex-1 bg-background p-4 relative min-h-0">
+      <div className="w-full h-full bg-card rounded-lg border border-border shadow-sm overflow-hidden">
         {hasSignalsSelected ? (
           <iframe
             src={dashUrl}
@@ -24,7 +24,7 @@ export function ChartArea({
             title="chart"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-zinc-400">
+          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
             Select a signal from the sidebar
           </div>
         )}

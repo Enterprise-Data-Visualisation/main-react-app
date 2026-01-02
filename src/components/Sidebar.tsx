@@ -30,23 +30,23 @@ export function Sidebar({
   onToggleSignal,
 }: Readonly<SidebarProps>) {
   return (
-    <div className="w-64 h-screen bg-zinc-950 text-white flex flex-col border-r border-zinc-800">
-      <div className="p-4 border-b border-zinc-800 flex items-center gap-2">
-        <Activity className="text-blue-500" />
+    <div className="w-64 h-screen bg-sidebar text-sidebar-foreground flex flex-col border-r border-sidebar-border">
+      <div className="p-4 border-b border-sidebar-border flex items-center gap-2">
+        <Activity className="text-sidebar-primary" />
         <h1 className="font-bold text-lg tracking-tight">MTSS Monitor</h1>
       </div>
 
       <div className="flex-1 overflow-y-auto p-2">
-        <h2 className="text-xs font-semibold text-zinc-500 uppercase mb-3 px-2 mt-2">
+        <h2 className="text-xs font-semibold text-muted-foreground uppercase mb-3 px-2 mt-2">
           Signal Browser
         </h2>
 
         {loading && !signals.length && (
-          <div className="p-4 text-zinc-500">
+          <div className="p-4 text-muted-foreground">
             <Loader2 className="animate-spin w-4 h-4" />
           </div>
         )}
-        {error && <div className="p-4 text-red-500 text-xs">{error}</div>}
+        {error && <div className="p-4 text-destructive text-xs">{error}</div>}
         {!error && signals.length > 0 && (
           <div className="space-y-1">
             {signals.map((signal) => {
@@ -56,7 +56,9 @@ export function Sidebar({
                   key={signal.id}
                   variant={isSelected ? "secondary" : "ghost"}
                   className={`w-full justify-start h-auto py-3 px-3 ${
-                    isSelected ? "bg-zinc-800 text-white" : "text-zinc-400"
+                    isSelected
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                      : "text-muted-foreground"
                   }`}
                   onClick={() => onToggleSignal(signal.id)}
                 >
@@ -64,8 +66,8 @@ export function Sidebar({
                     <div
                       className={`flex items-center justify-center w-4 h-4 rounded border ${
                         isSelected
-                          ? "bg-blue-500 border-blue-500"
-                          : "border-zinc-600"
+                          ? "bg-sidebar-primary border-sidebar-primary"
+                          : "border-sidebar-border"
                       }`}
                     >
                       {isSelected && <Check size={10} className="text-white" />}
@@ -74,7 +76,7 @@ export function Sidebar({
                       <div className="text-sm font-medium leading-none">
                         {signal.name}
                       </div>
-                      <div className="text-[10px] text-zinc-500 mt-1">
+                      <div className="text-[10px] text-muted-foreground mt-1">
                         {signal.location}
                       </div>
                     </div>
