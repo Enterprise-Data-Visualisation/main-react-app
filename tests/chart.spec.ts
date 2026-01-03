@@ -12,12 +12,12 @@ test.describe('Chart Display', () => {
 
     // Check CSS - should be centered (flexbox)
     const display = await emptyState.evaluate(
-      (el) => window.getComputedStyle(el).display
+      (el) => globalThis.getComputedStyle(el).display
     );
     expect(display).toBe('flex');
 
     const justifyContent = await emptyState.evaluate(
-      (el) => window.getComputedStyle(el).justifyContent
+      (el) => globalThis.getComputedStyle(el).justifyContent
     );
     expect(justifyContent).toBe('center');
   });
@@ -26,17 +26,14 @@ test.describe('Chart Display', () => {
     const container = page.locator('[data-testid="chart-container"]');
     await expect(container).toBeVisible();
 
-    // Should have border-radius (rounded-lg)
-    const borderRadius = await container.evaluate(
-      (el) => window.getComputedStyle(el).borderRadius
-    );
-    expect(parseFloat(borderRadius)).toBeGreaterThan(0);
-
-    // Should have border
+    // Should be full width/height (edge-to-edge)
+    // We removed borders to maximize space
     const borderWidth = await container.evaluate(
-      (el) => window.getComputedStyle(el).borderWidth
+      (el) => globalThis.getComputedStyle(el).borderWidth
     );
-    expect(parseFloat(borderWidth)).toBeGreaterThan(0);
+    // Expect no border or 0px
+    const width = parseFloat(borderWidth);
+    expect(width).toBe(0);
   });
 
   test('should show chart iframe when signal is selected', async ({ page }) => {

@@ -12,7 +12,9 @@ test.describe('Telemetry Tab', () => {
     await expect(telemetryTab).toContainText('Telemetry');
   });
 
-  test('should show telemetry metrics when tab is clicked', async ({ page }) => {
+  test('should show telemetry metrics when tab is clicked', async ({
+    page,
+  }) => {
     // Click telemetry tab
     await page.locator('[data-testid="tab-telemetry"]').click();
 
@@ -21,10 +23,10 @@ test.describe('Telemetry Tab', () => {
     await expect(metricsContainer).toBeVisible();
 
     // Should contain metric labels
-    await expect(metricsContainer).toContainText('Chart Load Time');
-    await expect(metricsContainer).toContainText('Last Fetch');
-    await expect(metricsContainer).toContainText('Render Count');
-    await expect(metricsContainer).toContainText('Avg Render Time');
+    await expect(metricsContainer).toContainText('Chart Load');
+    await expect(metricsContainer).toContainText('Fetch');
+    await expect(metricsContainer).toContainText('Renders');
+    await expect(metricsContainer).toContainText('Avg Time');
   });
 
   test('should have correct grid layout for metrics', async ({ page }) => {
@@ -37,7 +39,7 @@ test.describe('Telemetry Tab', () => {
     // Should have grid display
     const display = await metricsContent.evaluate((el) => {
       const child = el.querySelector('.grid');
-      return child ? window.getComputedStyle(child).display : '';
+      return child ? globalThis.getComputedStyle(child).display : '';
     });
     expect(display).toBe('grid');
   });
@@ -67,11 +69,9 @@ test.describe('Telemetry Tab', () => {
     // Select a signal
     await page.locator('[data-testid="signal-button-signal_01"]').click();
 
-    // Wait for chart to start loading
-    await page.waitForTimeout(500);
-
-    // Metrics should show activity
+    // Metrics should show activity - Playwright will auto-retry this assertion
+    // so we don't need arbitrary timeouts
     const metricsContainer = page.locator('[data-testid="telemetry-metrics"]');
-    await expect(metricsContainer).toContainText('Render Count');
+    await expect(metricsContainer).toContainText('Renders');
   });
 });

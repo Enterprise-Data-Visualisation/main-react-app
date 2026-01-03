@@ -49,11 +49,11 @@ export function ChartArea({
   return (
     <div
       data-testid="chart-area"
-      className="flex-1 bg-background p-4 relative min-h-0"
+      className="flex-1 bg-background relative min-h-0"
     >
       <div
         data-testid="chart-container"
-        className="w-full h-full bg-card rounded-lg border border-border shadow-sm overflow-hidden"
+        className="w-full h-full bg-card shadow-sm overflow-hidden"
       >
         {hasSignalsSelected ? (
           <iframe

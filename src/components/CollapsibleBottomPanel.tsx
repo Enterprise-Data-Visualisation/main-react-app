@@ -31,21 +31,21 @@ export function CollapsibleBottomPanel({
         <Button
           variant="ghost"
           size="sm"
-          className="w-full justify-start rounded-none h-10 px-4 hover:bg-muted"
+          className="w-full justify-start rounded-none h-8 px-4 hover:bg-muted"
         >
           <ChevronDown
-            className={`h-4 w-4 transition-transform duration-200 ${
+            className={`h-3.5 w-3.5 transition-transform duration-200 ${
               isOpen ? 'rotate-0' : '-rotate-90'
             }`}
           />
-          <span className="ml-2 text-sm font-semibold text-foreground">
+          <span className="ml-2 text-xs font-semibold text-foreground uppercase tracking-wider">
             {title}
           </span>
         </Button>
       </CollapsibleTrigger>
 
       <CollapsibleContent className="flex-1 overflow-hidden border-t border-border bg-background">
-        <div className="w-full h-full overflow-y-auto">{children}</div>
+        <div className="w-full h-full overflow-y-auto p-0">{children}</div>
       </CollapsibleContent>
     </Collapsible>
   );

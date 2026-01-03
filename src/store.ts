@@ -9,10 +9,14 @@ interface SignalStore {
   activeSignalIds: string[]; // Array for multi-select
   isLive: boolean;
   dateRange: DateRange;
+  customColors: Record<string, string>;
+  highlightedSignalId: string | null;
 
   toggleSignal: (id: string) => void;
   toggleLiveMode: () => void;
   setDateRange: (range: DateRange) => void;
+  setSignalColor: (id: string, color: string) => void;
+  setHighlightedSignal: (id: string | null) => void;
 }
 
 export const useSignalStore = create<SignalStore>((set) => ({
@@ -22,6 +26,9 @@ export const useSignalStore = create<SignalStore>((set) => ({
     start: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Yesterday
     end: new Date().toISOString(), // Now
   },
+
+  customColors: {},
+  highlightedSignalId: null,
 
   toggleSignal: (id) =>
     set((state) => {
@@ -38,4 +45,11 @@ export const useSignalStore = create<SignalStore>((set) => ({
   toggleLiveMode: () => set((state) => ({ isLive: !state.isLive })),
 
   setDateRange: (range) => set({ dateRange: range }),
+
+  setSignalColor: (id, color) =>
+    set((state) => ({
+      customColors: { ...state.customColors, [id]: color },
+    })),
+
+  setHighlightedSignal: (id) => set({ highlightedSignalId: id }),
 }));
