@@ -1,5 +1,5 @@
-import { Activity, Check, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Activity, Check, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface Signal {
   id: string;
@@ -30,53 +30,86 @@ export function Sidebar({
   onToggleSignal,
 }: Readonly<SidebarProps>) {
   return (
-    <div className="w-64 h-screen bg-sidebar text-sidebar-foreground flex flex-col border-r border-sidebar-border">
-      <div className="p-4 border-b border-sidebar-border flex items-center gap-2">
+    <aside
+      data-testid="sidebar"
+      className="w-64 h-screen bg-sidebar text-sidebar-foreground flex flex-col border-r border-sidebar-border"
+    >
+      <div
+        data-testid="sidebar-header"
+        className="p-4 border-b border-sidebar-border flex items-center gap-2"
+      >
         <Activity className="text-sidebar-primary" />
-        <h1 className="font-bold text-lg tracking-tight">MTSS Monitor</h1>
+        <h1
+          data-testid="app-title"
+          className="font-bold text-lg tracking-tight"
+        >
+          MTSS Monitor
+        </h1>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-2">
-        <h2 className="text-xs font-semibold text-muted-foreground uppercase mb-3 px-2 mt-2">
+      <div data-testid="signal-browser" className="flex-1 overflow-y-auto p-2">
+        <h2
+          data-testid="signal-browser-title"
+          className="text-xs font-semibold text-muted-foreground uppercase mb-3 px-2 mt-2"
+        >
           Signal Browser
         </h2>
 
         {loading && !signals.length && (
-          <div className="p-4 text-muted-foreground">
+          <div
+            data-testid="loading-spinner"
+            className="p-4 text-muted-foreground"
+          >
             <Loader2 className="animate-spin w-4 h-4" />
           </div>
         )}
-        {error && <div className="p-4 text-destructive text-xs">{error}</div>}
+        {error && (
+          <div
+            data-testid="error-message"
+            className="p-4 text-destructive text-xs"
+          >
+            {error}
+          </div>
+        )}
         {!error && signals.length > 0 && (
-          <div className="space-y-1">
+          <div data-testid="signal-list" className="space-y-1">
             {signals.map((signal) => {
               const isSelected = activeSignalIds.includes(signal.id);
               return (
                 <Button
                   key={signal.id}
-                  variant={isSelected ? "secondary" : "ghost"}
+                  data-testid={`signal-button-${signal.id}`}
+                  data-selected={isSelected}
+                  variant={isSelected ? 'secondary' : 'ghost'}
                   className={`w-full justify-start h-auto py-3 px-3 ${
                     isSelected
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                      : "text-muted-foreground"
+                      ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                      : 'text-muted-foreground'
                   }`}
                   onClick={() => onToggleSignal(signal.id)}
                 >
                   <div className="flex items-center w-full gap-3">
                     <div
+                      data-testid={`signal-checkbox-${signal.id}`}
                       className={`flex items-center justify-center w-4 h-4 rounded border ${
                         isSelected
-                          ? "bg-sidebar-primary border-sidebar-primary"
-                          : "border-sidebar-border"
+                          ? 'bg-sidebar-primary border-sidebar-primary'
+                          : 'border-sidebar-border'
                       }`}
                     >
                       {isSelected && <Check size={10} className="text-white" />}
                     </div>
                     <div className="flex-1 text-left">
-                      <div className="text-sm font-medium leading-none">
+                      <div
+                        data-testid={`signal-name-${signal.id}`}
+                        className="text-sm font-medium leading-none"
+                      >
                         {signal.name}
                       </div>
-                      <div className="text-[10px] text-muted-foreground mt-1">
+                      <div
+                        data-testid={`signal-location-${signal.id}`}
+                        className="text-[10px] text-muted-foreground mt-1"
+                      >
                         {signal.location}
                       </div>
                     </div>
@@ -87,6 +120,6 @@ export function Sidebar({
           </div>
         )}
       </div>
-    </div>
+    </aside>
   );
 }

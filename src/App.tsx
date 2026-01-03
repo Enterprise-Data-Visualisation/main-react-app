@@ -1,5 +1,5 @@
-import { Shell } from "./components/Shell";
-import { ThemeProvider } from "./contexts/ThemeContext";
+import { Shell } from './components/Shell';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 function App() {
   return (

@@ -1,11 +1,13 @@
-import { useSignalStore } from "../store";
-import { useGraphql } from "../hooks/useGraphQL";
-import { Header } from "./Header";
-import { Sidebar } from "./Sidebar";
-import { BottomPanel } from "./BottomPanel";
-import { CollapsibleBottomPanel } from "./CollapsibleBottomPanel";
-import type { GetSignalsData } from "@/types";
-import { ChartArea } from "./ChartArea";
+import { useSignalStore } from '../store';
+import { useGraphql } from '../hooks/useGraphQL';
+import { Header } from './Header';
+import { Sidebar } from './Sidebar';
+import { BottomPanel } from './BottomPanel';
+import { CollapsibleBottomPanel } from './CollapsibleBottomPanel';
+import { TelemetryPanel } from './TelemetryPanel';
+import { TelemetryProvider } from '@/contexts/TelemetryContext';
+import type { GetSignalsData } from '@/types';
+import { ChartArea } from './ChartArea';
 
 const GET_SIGNALS_QUERY = `
   query GetSignals {
@@ -48,13 +50,13 @@ export function Shell() {
 
   // Build URL with signal IDs and metadata (including colors)
   const COLORS = [
-    "#3b82f6", // chart-1: Blue
-    "#a855f7", // chart-2: Purple
-    "#0ea5e9", // chart-3: Cyan
-    "#10b981", // chart-4: Emerald/Teal
-    "#f59e0b", // chart-5: Amber
+    '#3b82f6', // chart-1: Blue
+    '#a855f7', // chart-2: Purple
+    '#0ea5e9', // chart-3: Cyan
+    '#10b981', // chart-4: Emerald/Teal
+    '#f59e0b', // chart-5: Amber
   ];
-  const signalsParam = activeSignalIds.join(",");
+  const signalsParam = activeSignalIds.join(',');
   const signalsMetadata = selectedSignals.map((s, idx) => ({
     id: s.id,
     name: s.name,
@@ -68,41 +70,46 @@ export function Shell() {
   )}&end=${encodeURIComponent(dateRange.end)}`;
 
   return (
-    <div className="flex h-screen bg-background font-sans text-foreground overflow-hidden">
-      {/* LEFT: Sidebar */}
-      <Sidebar
-        signals={data?.getSignals || []}
-        activeSignalIds={activeSignalIds}
-        loading={loading}
-        error={error}
-        onToggleSignal={toggleSignal}
-      />
-
-      {/* RIGHT: Main Content */}
-      <main className="flex-1 flex flex-col h-full min-w-0">
-        {/* TOP: Header */}
-        <Header
-          selectedSignalsCount={activeSignalIds.length}
-          isLive={isLive}
-          onToggleLiveMode={toggleLiveMode}
+    <TelemetryProvider>
+      <div className="flex h-screen bg-background font-sans text-foreground overflow-hidden">
+        {/* LEFT: Sidebar */}
+        <Sidebar
+          signals={data?.getSignals || []}
+          activeSignalIds={activeSignalIds}
+          loading={loading}
+          error={error}
+          onToggleSignal={toggleSignal}
         />
 
-        {/* MIDDLE: Chart Area */}
-        <ChartArea
-          dashUrl={dashUrl}
-          hasSignalsSelected={activeSignalIds.length > 0}
-        />
-
-        {/* BOTTOM: Timeline & Legend (Collapsible) */}
-        <CollapsibleBottomPanel title="Timeline & Legend" defaultOpen={true}>
-          <BottomPanel
-            dateRange={dateRange}
+        {/* RIGHT: Main Content */}
+        <main className="flex-1 flex flex-col h-full min-w-0">
+          {/* TOP: Header */}
+          <Header
+            selectedSignalsCount={activeSignalIds.length}
             isLive={isLive}
-            selectedSignals={selectedSignals}
-            onSetDateRange={setDateRange}
+            onToggleLiveMode={toggleLiveMode}
           />
-        </CollapsibleBottomPanel>
-      </main>
-    </div>
+
+          {/* MIDDLE: Chart Area */}
+          <ChartArea
+            dashUrl={dashUrl}
+            hasSignalsSelected={activeSignalIds.length > 0}
+          />
+
+          {/* BOTTOM: Timeline & Legend (Collapsible) */}
+          <CollapsibleBottomPanel title="Timeline & Legend" defaultOpen={true}>
+            <BottomPanel
+              dateRange={dateRange}
+              isLive={isLive}
+              selectedSignals={selectedSignals}
+              onSetDateRange={setDateRange}
+            />
+          </CollapsibleBottomPanel>
+
+          {/* BOTTOM: Telemetry Panel */}
+          <TelemetryPanel />
+        </main>
+      </div>
+    </TelemetryProvider>
   );
 }

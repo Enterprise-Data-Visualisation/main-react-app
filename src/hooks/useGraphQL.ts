@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 // Define the return type of our hook
 interface UseGraphqlResult<T> {
@@ -11,34 +11,34 @@ interface UseGraphqlResult<T> {
 // Mock data for production deployment (no GraphQL backend)
 const MOCK_SIGNALS = [
   {
-    id: "signal_01",
-    name: "Temperature Sensor",
-    location: "Building A",
-    type: "Temperature",
+    id: 'signal_01',
+    name: 'Temperature Sensor',
+    location: 'Building A',
+    type: 'Temperature',
   },
   {
-    id: "signal_02",
-    name: "Humidity Sensor",
-    location: "Building B",
-    type: "Humidity",
+    id: 'signal_02',
+    name: 'Humidity Sensor',
+    location: 'Building B',
+    type: 'Humidity',
   },
   {
-    id: "signal_03",
-    name: "Pressure Gauge",
-    location: "Lab 1",
-    type: "Pressure",
+    id: 'signal_03',
+    name: 'Pressure Gauge',
+    location: 'Lab 1',
+    type: 'Pressure',
   },
   {
-    id: "signal_04",
-    name: "Flow Meter",
-    location: "Lab 2",
-    type: "Flow",
+    id: 'signal_04',
+    name: 'Flow Meter',
+    location: 'Lab 2',
+    type: 'Flow',
   },
   {
-    id: "signal_05",
-    name: "Power Monitor",
-    location: "Server Room",
-    type: "Power",
+    id: 'signal_05',
+    name: 'Power Monitor',
+    location: 'Server Room',
+    type: 'Power',
   },
 ];
 
@@ -46,31 +46,59 @@ const MOCK_SIGNALS = [
 // TVariables = The shape of variables (default to empty object)
 export function useGraphql<
   TData = unknown,
-  TVariables = Record<string, unknown>
+  TVariables = Record<string, unknown>,
 >(
+  // These parameters are unused in mock implementation but kept for API compatibility
   _query: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _variables: TVariables = {} as TVariables
 ): UseGraphqlResult<TData> {
-  const [data, setData] = useState<TData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const error: string | null = null;
+  const [state, setState] = useState<{
+    data: TData | null;
+    loading: boolean;
+    error: string | null;
+  }>({
+    data: null,
+    loading: true,
+    error: null,
+  });
 
-  const refetch = useCallback(async (): Promise<void> => {
-    setLoading(true);
+  const isMountedRef = useRef(true);
+
+  const fetchData = useCallback(async () => {
     // Simulate async loading
     await new Promise((resolve) => setTimeout(resolve, 100));
     const mockData = { getSignals: MOCK_SIGNALS } as TData;
-    setData(mockData);
-    setLoading(false);
+    return mockData;
   }, []);
+
+  const refetch = useCallback(async (): Promise<void> => {
+    setState((prev) => ({ ...prev, loading: true }));
+    const mockData = await fetchData();
+    if (isMountedRef.current) {
+      setState({ data: mockData, loading: false, error: null });
+    }
+  }, [fetchData]);
 
   useEffect(() => {
-    // Use mock data immediately for production
-    const mockData = { getSignals: MOCK_SIGNALS } as TData;
-    setData(mockData);
-    setLoading(false);
-  }, []);
+    isMountedRef.current = true;
 
-  return { data, loading, error, refetch };
+    // Load initial data
+    fetchData().then((mockData) => {
+      if (isMountedRef.current) {
+        setState({ data: mockData, loading: false, error: null });
+      }
+    });
+
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, [fetchData]);
+
+  return {
+    data: state.data,
+    loading: state.loading,
+    error: state.error,
+    refetch,
+  };
 }
-

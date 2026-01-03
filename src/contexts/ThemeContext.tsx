@@ -1,7 +1,8 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
-export type Theme = "light" | "dark";
-export type ThemeName = "aurora" | "ocean" | "sunset" | "forest";
+export type Theme = 'light' | 'dark';
+export type ThemeName = 'aurora' | 'ocean' | 'sunset' | 'forest';
 
 interface ThemeContextType {
   theme: Theme;
@@ -17,49 +18,49 @@ export function ThemeProvider({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const [theme, setThemeValue] = useState<Theme>(() => {
-    const stored = localStorage.getItem("theme") as Theme | null;
+    const stored = localStorage.getItem('theme') as Theme | null;
     if (stored) return stored;
-    if (typeof globalThis !== "undefined" && globalThis.window) {
-      return globalThis.window.matchMedia("(prefers-color-scheme: dark)")
+    if (typeof globalThis !== 'undefined' && globalThis.window) {
+      return globalThis.window.matchMedia('(prefers-color-scheme: dark)')
         .matches
-        ? "dark"
-        : "light";
+        ? 'dark'
+        : 'light';
     }
-    return "light";
+    return 'light';
   });
 
   const [themeName, setThemeNameValue] = useState<ThemeName>(() => {
-    const stored = localStorage.getItem("themeName") as ThemeName | null;
-    return stored || "aurora";
+    const stored = localStorage.getItem('themeName') as ThemeName | null;
+    return stored || 'aurora';
   });
 
   useEffect(() => {
     const root = document.documentElement;
 
     // Apply dark/light mode
-    if (theme === "dark") {
-      root.classList.add("dark");
+    if (theme === 'dark') {
+      root.classList.add('dark');
     } else {
-      root.classList.remove("dark");
+      root.classList.remove('dark');
     }
 
     // Apply theme variant (aurora, ocean, sunset, forest)
     root.classList.remove(
-      "theme-aurora",
-      "theme-ocean",
-      "theme-sunset",
-      "theme-forest"
+      'theme-aurora',
+      'theme-ocean',
+      'theme-sunset',
+      'theme-forest'
     );
-    if (themeName !== "aurora") {
+    if (themeName !== 'aurora') {
       root.classList.add(`theme-${themeName}`);
     }
 
-    localStorage.setItem("theme", theme);
-    localStorage.setItem("themeName", themeName);
+    localStorage.setItem('theme', theme);
+    localStorage.setItem('themeName', themeName);
   }, [theme, themeName]);
 
   const toggleTheme = () => {
-    setThemeValue((prev) => (prev === "light" ? "dark" : "light"));
+    setThemeValue((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
 
   const setTheme = (newTheme: Theme) => {
@@ -89,7 +90,7 @@ export function ThemeProvider({
 export function useTheme() {
   const context = useContext(ThemeContext);
   if (context === undefined) {
-    throw new Error("useTheme must be used within a ThemeProvider");
+    throw new Error('useTheme must be used within a ThemeProvider');
   }
   return context;
 }

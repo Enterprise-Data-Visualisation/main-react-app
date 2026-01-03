@@ -4,7 +4,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from "@/components/ui/card";
+} from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -12,9 +12,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface Signal {
   id: string;
@@ -56,8 +56,8 @@ export function BottomPanel({
           </CardTitle>
           <CardDescription className="text-xs">
             {isLive
-              ? "Controls disabled during live stream"
-              : "Adjust playback range"}
+              ? 'Controls disabled during live stream'
+              : 'Adjust playback range'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -142,10 +142,10 @@ export function BottomPanel({
                         className="inline-block w-2.5 h-2.5 rounded-full ring-1 ring-border"
                         style={{
                           backgroundColor: [
-                            "var(--chart-1)",
-                            "var(--chart-2)",
-                            "var(--chart-3)",
-                            "var(--chart-4)",
+                            'var(--chart-1)',
+                            'var(--chart-2)',
+                            'var(--chart-3)',
+                            'var(--chart-4)',
                           ][index % 4],
                         }}
                       />

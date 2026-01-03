@@ -1,12 +1,12 @@
-import { useState } from "react";
-import { ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   Collapsible,
   CollapsibleTrigger,
   CollapsibleContent,
-} from "@/components/ui/collapsible";
-import type { ReactNode } from "react";
+} from '@/components/ui/collapsible';
+import type { ReactNode } from 'react';
 
 interface CollapsibleBottomPanelProps {
   readonly title: string;
@@ -35,7 +35,7 @@ export function CollapsibleBottomPanel({
         >
           <ChevronDown
             className={`h-4 w-4 transition-transform duration-200 ${
-              isOpen ? "rotate-0" : "-rotate-90"
+              isOpen ? 'rotate-0' : '-rotate-90'
             }`}
           />
           <span className="ml-2 text-sm font-semibold text-foreground">

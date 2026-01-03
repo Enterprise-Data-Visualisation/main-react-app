@@ -1,4 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 export function ThemeShowcase() {
   return (
@@ -58,7 +64,9 @@ export function ThemeShowcase() {
         <Card>
           <CardHeader>
             <CardTitle>Card Title</CardTitle>
-            <CardDescription>This shows how components look with the theme</CardDescription>
+            <CardDescription>
+              This shows how components look with the theme
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex gap-2 flex-wrap">
@@ -87,7 +95,8 @@ export function ThemeShowcase() {
             <div>
               <strong className="text-primary">CSS Variables:</strong>
               <p className="text-muted-foreground">
-                All colors are defined as CSS custom properties (--primary, --background, etc.)
+                All colors are defined as CSS custom properties (--primary,
+                --background, etc.)
               </p>
             </div>
             <div>
@@ -99,7 +108,8 @@ export function ThemeShowcase() {
             <div>
               <strong className="text-accent">Tailwind Integration:</strong>
               <p className="text-muted-foreground">
-                Use classes like bg-primary, text-foreground, border-border directly
+                Use classes like bg-primary, text-foreground, border-border
+                directly
               </p>
             </div>
             <div>
@@ -115,13 +125,7 @@ export function ThemeShowcase() {
   );
 }
 
-function ColorSwatch({
-  name,
-  className,
-}: {
-  name: string;
-  className: string;
-}) {
+function ColorSwatch({ name, className }: { name: string; className: string }) {
   return (
     <div className="space-y-2">
       <div className={`h-20 rounded-lg border border-border ${className}`} />

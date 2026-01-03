@@ -1,12 +1,12 @@
-import { useTheme, type ThemeName } from "@/contexts/ThemeContext";
-import { Button } from "@/components/ui/button";
-import { Palette } from "lucide-react";
+import { useTheme, type ThemeName } from '@/contexts/ThemeContext';
+import { Button } from '@/components/ui/button';
+import { Palette } from 'lucide-react';
 
 const THEMES: { value: ThemeName; label: string }[] = [
-  { value: "aurora", label: "Aurora" },
-  { value: "ocean", label: "Ocean" },
-  { value: "sunset", label: "Sunset" },
-  { value: "forest", label: "Forest" },
+  { value: 'aurora', label: 'Aurora' },
+  { value: 'ocean', label: 'Ocean' },
+  { value: 'sunset', label: 'Sunset' },
+  { value: 'forest', label: 'Forest' },
 ];
 
 export function ThemeSelector() {
@@ -19,7 +19,7 @@ export function ThemeSelector() {
         {THEMES.map((theme) => (
           <Button
             key={theme.value}
-            variant={themeName === theme.value ? "default" : "ghost"}
+            variant={themeName === theme.value ? 'default' : 'ghost'}
             size="sm"
             onClick={() => setThemeName(theme.value)}
             className="text-xs"
