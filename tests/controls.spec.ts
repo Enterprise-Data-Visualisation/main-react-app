@@ -35,41 +35,30 @@ test.describe('Timeline Controls', () => {
     expect(hasDestructiveClass).toBe(true);
   });
 
-  test('should have date range inputs in bottom panel', async ({ page }) => {
-    // Expand bottom panel if needed
-    const startTimeInput = page.locator('#start-time');
-    const endTimeInput = page.locator('#end-time');
+  test('should have timeline slider in timeline tab', async ({ page }) => {
+    // Click timeline tab
+    await page.locator('[data-testid="tab-timeline"]').click();
 
-    await expect(startTimeInput).toBeVisible();
-    await expect(endTimeInput).toBeVisible();
+    // Timeline controls should be visible
+    const timelineControls = page.locator('[data-testid="timeline-controls"]');
+    await expect(timelineControls).toBeVisible();
 
-    // Verify they have values
-    const startValue = await startTimeInput.inputValue();
-    const endValue = await endTimeInput.inputValue();
-
-    expect(startValue).toBeTruthy();
-    expect(endValue).toBeTruthy();
+    // Slider should be visible
+    const slider = page.locator('[data-testid="timeline-slider"]');
+    await expect(slider).toBeVisible();
   });
 
-  test('should update date range when changed', async ({ page }) => {
-    const startTimeInput = page.locator('#start-time');
+  test('should disable slider when in live mode', async ({ page }) => {
+    // Click timeline tab
+    await page.locator('[data-testid="tab-timeline"]').click();
 
-    // Change the value
-    await startTimeInput.fill('2025-06-15T12:00');
-
-    // Verify it changed
-    const newValue = await startTimeInput.inputValue();
-    expect(newValue).toBe('2025-06-15T12:00');
-  });
-
-  test('should disable date inputs when in live mode', async ({ page }) => {
     const liveToggle = page.locator('[data-testid="live-toggle"]');
-    const startTimeInput = page.locator('#start-time');
+    const slider = page.locator('[data-testid="timeline-slider"]');
 
     // Enable live mode
     await liveToggle.click();
 
-    // Date inputs should be disabled
-    await expect(startTimeInput).toBeDisabled();
+    // Slider should be disabled
+    await expect(slider).toHaveAttribute('data-disabled', '');
   });
 });
