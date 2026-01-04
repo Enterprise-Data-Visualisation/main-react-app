@@ -119,8 +119,9 @@ export function Header({
 
         <span
           data-testid="live-status"
-          className={`text-sm font-medium ${isLive ? 'text-destructive' : 'text-muted-foreground'
-            }`}
+          className={`text-sm font-medium ${
+            isLive ? 'text-destructive' : 'text-muted-foreground'
+          }`}
         >
           {isLive ? 'Live Stream' : 'Historical'}
         </span>
