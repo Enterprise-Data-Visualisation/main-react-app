@@ -63,7 +63,7 @@ export function TimelineControls({
     return () => clearInterval(interval);
   }, []);
 
-  const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
+  const oneYearAgo = now - 365 * 24 * 60 * 60 * 1000;
 
   // Current range as timestamps
   const startTime = new Date(dateRange.start).getTime();
@@ -71,13 +71,13 @@ export function TimelineControls({
 
   // Convert to slider values
   const sliderValues = [
-    timestampToSlider(startTime, sevenDaysAgo, now),
-    timestampToSlider(endTime, sevenDaysAgo, now),
+    timestampToSlider(startTime, oneYearAgo, now),
+    timestampToSlider(endTime, oneYearAgo, now),
   ];
 
   const handleSliderChange = (values: number[]) => {
-    const newStart = sliderToTimestamp(values[0], sevenDaysAgo, now);
-    const newEnd = sliderToTimestamp(values[1], sevenDaysAgo, now);
+    const newStart = sliderToTimestamp(values[0], oneYearAgo, now);
+    const newEnd = sliderToTimestamp(values[1], oneYearAgo, now);
     onSetDateRange({
       start: new Date(newStart).toISOString(),
       end: new Date(newEnd).toISOString(),
@@ -116,7 +116,7 @@ export function TimelineControls({
 
         {/* Timeline bounds */}
         <div className="flex justify-between text-[9px] text-muted-foreground/50">
-          <span>-7d</span>
+          <span>-1y</span>
           <span>Now</span>
         </div>
       </CardContent>

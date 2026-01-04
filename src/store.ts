@@ -57,7 +57,22 @@ export const useSignalStore = create<SignalStore>()(
           return { hiddenSignalIds: [...state.hiddenSignalIds, id] };
         }),
 
-      toggleLiveMode: () => set((state) => ({ isLive: !state.isLive })),
+      toggleLiveMode: () =>
+        set((state) => {
+          const newIsLive = !state.isLive;
+          let newDateRange = state.dateRange;
+
+          // If switching TO live mode, snap to last 5 minutes
+          if (newIsLive) {
+            const now = Date.now();
+            newDateRange = {
+              start: new Date(now - 5 * 60 * 1000).toISOString(),
+              end: new Date(now).toISOString(),
+            };
+          }
+
+          return { isLive: newIsLive, dateRange: newDateRange };
+        }),
 
       setDateRange: (range) => set({ dateRange: range }),
 
