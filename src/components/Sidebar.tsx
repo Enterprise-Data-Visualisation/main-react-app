@@ -384,7 +384,7 @@ export function Sidebar({
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentParentId, setCurrentParentId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'BROWSE' | 'SEARCH'>('SEARCH');
+  const [viewMode, setViewMode] = useState<'BROWSE' | 'SEARCH'>('BROWSE');
   const [activeTab, setActiveTab] = useState('assets');
 
   // Store Actions
