@@ -67,7 +67,12 @@ test.describe('Telemetry Tab', () => {
     await page.locator('[data-testid="tab-telemetry"]').click();
 
     // Select a signal
-    await page.locator('[data-testid="signal-button-signal_01"]').click();
+    // Search for signal first
+    await page.getByPlaceholder('Search assets...').fill('TI-1001');
+    const signalBtn = page.getByRole('button', { name: 'TI-1001' }).first();
+    await expect(signalBtn).toBeVisible();
+
+    await signalBtn.click();
 
     // Metrics should show activity - Playwright will auto-retry this assertion
     // so we don't need arbitrary timeouts

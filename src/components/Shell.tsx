@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSignalStore } from '../store';
-import { useGraphql } from '../hooks/useGraphQL';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { CollapsibleBottomPanel } from './CollapsibleBottomPanel';
@@ -11,15 +10,33 @@ import { TelemetryProvider, useTelemetry } from '@/contexts/TelemetryContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Timer, List, Activity } from 'lucide-react';
-import type { GetSignalsData } from '@/types';
 import { ChartArea } from './ChartArea';
+import type { Signal } from '../types';
 
-const GET_SIGNALS_QUERY = `
-  query GetSignals {
-    getSignals {
+// Helper for GraphQL Fetch (Duplicate of Sidebar, could be a shared util)
+const GRAPHQL_ENDPOINT = 'http://localhost:4001';
+
+async function fetchGraphQL(
+  query: string,
+  variables: Record<string, unknown> = {}
+) {
+  const response = await fetch(GRAPHQL_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query, variables }),
+  });
+  const json = await response.json();
+  if (json.errors) {
+    throw new Error(json.errors[0].message);
+  }
+  return json.data;
+}
+
+const GET_ASSETS_BY_IDS_QUERY = `
+  query GetAssetsByIds($ids: [ID!]!) {
+    getAssetsByIds(ids: $ids) {
       id
       name
-      location
       type
     }
   }
@@ -30,6 +47,8 @@ function ShellContent() {
   // State management
   const {
     activeSignalIds,
+    hiddenSignalIds,
+    toggleSignalVisibility,
     isLive,
     toggleLiveMode,
     dateRange,
@@ -47,13 +66,43 @@ function ShellContent() {
   // Get telemetry metrics from context
   const { metrics } = useTelemetry();
 
-  // Data fetching
-  const { loading, error, data } =
-    useGraphql<GetSignalsData>(GET_SIGNALS_QUERY);
+  // Data fetching (Fetch details for selected signals only)
+  const [selectedSignals, setSelectedSignals] = useState<Signal[]>([]);
 
-  // Derived data
-  const selectedSignals =
-    data?.getSignals.filter((s) => activeSignalIds.includes(s.id)) || [];
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    async function fetchData() {
+      if (activeSignalIds.length === 0) {
+        if (active) setSelectedSignals([]);
+        return;
+      }
+
+      setError(null);
+      try {
+        const data = await fetchGraphQL(GET_ASSETS_BY_IDS_QUERY, {
+          ids: activeSignalIds,
+        });
+        if (active) setSelectedSignals(data.getAssetsByIds);
+      } catch (err: unknown) {
+        if (active) {
+          if (err instanceof Error) {
+            setError(err.message);
+          } else {
+            setError('An unknown error occurred');
+          }
+        }
+      }
+    }
+
+    fetchData();
+
+    return () => {
+      active = false;
+    };
+  }, [activeSignalIds]);
 
   // Build URL with signal IDs and metadata (including colors)
   const COLORS = [
@@ -63,11 +112,22 @@ function ShellContent() {
     '#10b981', // chart-4: Emerald/Teal
     '#f59e0b', // chart-5: Amber
   ];
-  const signalsParam = activeSignalIds.join(',');
-  const signalsMetadata = selectedSignals.map((s, idx) => ({
+
+  // Logic: "Hide" button simply excludes the signal from the Dash URL.
+  // The Sidebar toggle adds/removes to activeSignalIds.
+  // The LegendTable shows activeSignalIds (via selectedSignals), and uses hiddenSignalIds to toggle visibility.
+  const visibleSignalIds = activeSignalIds.filter(
+    (id) => !hiddenSignalIds.includes(id)
+  );
+  const signalsParam = visibleSignalIds.join(',');
+
+  const signalsMetadata = selectedSignals.map((s: Signal, idx: number) => ({
     id: s.id,
     name: s.name,
     color: customColors[s.id] || COLORS[idx % COLORS.length],
+    // If hidden, Dash app doesn't receive it via signalParam, so it shouldn't plot.
+    // Metadata can include all selected signals or just visible ones.
+    // If we only send visible IDs in signal_id param, Dash should handle it.
   }));
 
   // Theme context
@@ -88,10 +148,7 @@ function ShellContent() {
     <div className="flex h-screen bg-background font-sans text-foreground overflow-hidden">
       {/* LEFT: Sidebar */}
       <Sidebar
-        signals={data?.getSignals || []}
         activeSignalIds={activeSignalIds}
-        loading={loading}
-        error={error}
         onToggleSignal={toggleSignal}
       />
 
@@ -107,7 +164,7 @@ function ShellContent() {
         {/* MIDDLE: Chart Area */}
         <ChartArea
           dashUrl={dashUrl}
-          hasSignalsSelected={activeSignalIds.length > 0}
+          hasSignalsSelected={visibleSignalIds.length > 0} // Only show chart if there are VISIBLE signals
         />
 
         {/* BOTTOM: Tabbed Panel (Collapsible) */}
@@ -141,13 +198,20 @@ function ShellContent() {
             </TabsContent>
 
             <TabsContent value="legend" className="px-4 py-2">
+              {error && (
+                <div className="text-destructive text-sm mb-2">
+                  Failed to load signal details: {error}
+                </div>
+              )}
               <LegendTable
                 selectedSignals={selectedSignals}
                 customColors={customColors}
                 highlightedId={highlightedSignalId}
-                onToggle={toggleSignal}
+                hiddenIds={hiddenSignalIds}
+                onToggle={toggleSignal} // Remains as Remove
                 onHighlight={setHighlightedSignal}
                 onColorChange={setSignalColor}
+                onToggleVisibility={toggleSignalVisibility}
               />
             </TabsContent>
 

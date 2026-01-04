@@ -8,7 +8,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Eye, Focus } from 'lucide-react';
+import { Eye, Focus, EyeOff, X } from 'lucide-react';
 
 interface Signal {
   id: string;
@@ -20,9 +20,11 @@ interface LegendTableProps {
   readonly selectedSignals: Signal[];
   readonly customColors: Record<string, string>;
   readonly highlightedId: string | null;
+  readonly hiddenIds: string[];
   readonly onToggle: (id: string) => void;
   readonly onHighlight: (id: string | null) => void;
   readonly onColorChange: (id: string, color: string) => void;
+  readonly onToggleVisibility: (id: string) => void;
 }
 
 const DEFAULT_COLORS = ['#3b82f6', '#a855f7', '#0ea5e9', '#10b981', '#f59e0b'];
@@ -31,9 +33,11 @@ export function LegendTable({
   selectedSignals,
   customColors,
   highlightedId,
-  onToggle,
+  hiddenIds,
+  onToggle, // Remove
   onHighlight,
   onColorChange,
+  onToggleVisibility,
 }: Readonly<LegendTableProps>) {
   return (
     <Card
@@ -65,13 +69,15 @@ export function LegendTable({
                   customColors[signal.id] ||
                   DEFAULT_COLORS[index % DEFAULT_COLORS.length];
                 const isHighlighted = highlightedId === signal.id;
-                const isDimmed = highlightedId && !isHighlighted;
+                const isHidden = hiddenIds.includes(signal.id);
+                // Dim if highlighted (others dimmed) OR if hidden
+                const isDimmed = (highlightedId && !isHighlighted) || isHidden;
 
                 return (
                   <TableRow
                     key={signal.id}
                     className={`h-8 hover:bg-muted/30 transition-opacity ${
-                      isDimmed ? 'opacity-40' : 'opacity-100'
+                      isDimmed ? 'opacity-50' : 'opacity-100'
                     }`}
                   >
                     <TableCell className="font-mono text-[10px] font-medium py-0 px-2 leading-8">
@@ -102,15 +108,34 @@ export function LegendTable({
                           <Focus className="h-3 w-3" />
                         </Button>
 
-                        {/* Visibility Toggle (Deselect) */}
+                        {/* Visibility Toggle */}
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-5 w-5 text-muted-foreground hover:text-foreground"
-                          onClick={() => onToggle(signal.id)}
-                          title="Hide Signal"
+                          className={`h-5 w-5 ${
+                            isHidden
+                              ? 'text-muted-foreground/50'
+                              : 'text-muted-foreground hover:text-foreground'
+                          }`}
+                          onClick={() => onToggleVisibility(signal.id)}
+                          title={isHidden ? 'Show Signal' : 'Hide Signal'}
                         >
-                          <Eye className="h-3 w-3" />
+                          {isHidden ? (
+                            <EyeOff className="h-3 w-3" />
+                          ) : (
+                            <Eye className="h-3 w-3" />
+                          )}
+                        </Button>
+
+                        {/* Remove Button */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5 text-muted-foreground hover:text-destructive"
+                          onClick={() => onToggle(signal.id)}
+                          title="Remove Signal"
+                        >
+                          <X className="h-3 w-3" />
                         </Button>
 
                         {/* Color Picker */}

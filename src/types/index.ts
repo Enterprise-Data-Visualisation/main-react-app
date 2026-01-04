@@ -8,9 +8,6 @@ export interface Asset {
 
 export interface Signal extends Asset {
   type: 'Signal';
-  // Add location if it's used elsewhere, but Asset usually covers base props.
-  // The old types.ts had location, verify usage?
-  // Codebase uses Asset mostly. I'll stick to my new definition.
 }
 
 export interface Snapshot {

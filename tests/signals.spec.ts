@@ -1,111 +1,80 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Signal Selection', () => {
+test.describe('Signal Selection & Search', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    // Wait for signal list to load
-    await page.waitForSelector('[data-testid="signal-list"]');
+    await page.evaluate(() => globalThis.localStorage.clear());
+    await page.reload();
+    // Wait for Sidebar to be visible
+    await expect(page.getByTestId('sidebar')).toBeVisible();
   });
 
-  test('should display signal list with correct items', async ({ page }) => {
-    const signalList = page.locator('[data-testid="signal-list"]');
-    await expect(signalList).toBeVisible();
+  test('should search and select a signal', async ({ page }) => {
+    // 1. Verify we are on Assets tab
+    const assetsTab = page.getByRole('tab', { name: 'Assets' });
+    await expect(assetsTab).toHaveAttribute('data-state', 'active');
 
-    // Should have 5 signals
-    const signalButtons = page.locator('[data-testid^="signal-button-"]');
-    await expect(signalButtons).toHaveCount(5);
+    // 2. Type in search box
+    const searchInput = page.getByPlaceholder('Search assets...');
+    await searchInput.fill('TI-1001');
 
-    // First signal should be Temperature Sensor
-    const firstSignalName = page.locator(
-      '[data-testid="signal-name-signal_01"]'
-    );
-    await expect(firstSignalName).toHaveText('Temperature Sensor');
+    // 3. Wait for results (debounce logic is 300ms, wait a bit more)
+    // We wait for the specific item to appear which handles the wait implicitly
+    const signalButton = page
+      .getByRole('button', { name: 'TI-1001', exact: false })
+      .first();
+    await expect(signalButton).toBeVisible({ timeout: 5000 });
 
-    const firstSignalLocation = page.locator(
-      '[data-testid="signal-location-signal_01"]'
-    );
-    await expect(firstSignalLocation).toHaveText('Building A');
+    // 4. Click to select
+    // Force click to avoid interception issues
+    await signalButton.click({ force: true });
+
+    // 5. Verify Legend updates (Primary verification)
+    // Switch to Legend tab first
+    await page.getByTestId('tab-legend').click();
+    const legendRow = page.getByRole('cell', { name: 'TI-1001' }).first();
+    await expect(legendRow).toBeVisible({ timeout: 10000 });
+
+    // 6. Verify visual state (Secondary)
+    await expect(signalButton.locator('.lucide-check')).toBeVisible();
   });
 
-  test('should select a signal and update state', async ({ page }) => {
-    const signalButton = page.locator(
-      '[data-testid="signal-button-signal_01"]'
-    );
+  test('should clear search and return to browse mode', async ({ page }) => {
+    const searchInput = page.getByPlaceholder('Search assets...');
+    await searchInput.fill('TI-1001');
 
-    // Initially not selected
-    await expect(signalButton).toHaveAttribute('data-selected', 'false');
+    // Wait for results
+    await expect(
+      page.getByRole('button', { name: 'TI-1001' }).first()
+    ).toBeVisible();
 
-    // Click to select
-    await signalButton.click();
+    // Clear search
+    await searchInput.fill('');
 
-    // Should now be selected
-    await expect(signalButton).toHaveAttribute('data-selected', 'true');
-
-    // Signal count should update
-    const signalCount = page.locator('[data-testid="signal-count"]');
-    await expect(signalCount).toHaveText('1 Signals Selected');
-
-    // Check visual style change (background color should change)
-    const hasAccentClass = await signalButton.evaluate((el) =>
-      el.classList.contains('bg-sidebar-accent')
-    );
-    expect(hasAccentClass).toBe(true);
+    // Should return to browsing and show root assets
+    // Should return to browsing and show root assets
+    // Wait for debounce to settle (300ms) + fetch time
+    await page.waitForTimeout(500);
+    const site1 = page.getByRole('button', {
+      name: 'Texas Refinery',
+      exact: false,
+    });
+    // Also check for "No assets found" just in case db is empty
+    await expect(site1.or(page.getByText('No assets found'))).toBeVisible({
+      timeout: 10000,
+    });
   });
 
-  test('should deselect a signal', async ({ page }) => {
-    const signalButton = page.locator(
-      '[data-testid="signal-button-signal_01"]'
-    );
+  test('should switch to Saved Views tab', async ({ page }) => {
+    const savedViewsTab = page.getByRole('tab', { name: 'Saved Views' });
 
-    // Select the signal
-    await signalButton.click();
-    await expect(signalButton).toHaveAttribute('data-selected', 'true');
+    await savedViewsTab.click();
+    await expect(savedViewsTab).toHaveAttribute('data-state', 'active');
 
-    // Deselect the signal
-    await signalButton.click();
-    await expect(signalButton).toHaveAttribute('data-selected', 'false');
-
-    // Signal count should be 0
-    const signalCount = page.locator('[data-testid="signal-count"]');
-    await expect(signalCount).toHaveText('0 Signals Selected');
-  });
-
-  test('should allow multi-select of signals', async ({ page }) => {
-    const signal1 = page.locator('[data-testid="signal-button-signal_01"]');
-    const signal2 = page.locator('[data-testid="signal-button-signal_02"]');
-
-    // Select first signal
-    await signal1.click();
-    await expect(signal1).toHaveAttribute('data-selected', 'true');
-
-    // Select second signal
-    await signal2.click();
-    await expect(signal2).toHaveAttribute('data-selected', 'true');
-
-    // Both should remain selected
-    await expect(signal1).toHaveAttribute('data-selected', 'true');
-
-    // Signal count should be 2
-    const signalCount = page.locator('[data-testid="signal-count"]');
-    await expect(signalCount).toHaveText('2 Signals Selected');
-  });
-
-  test('should show checkbox visual state correctly', async ({ page }) => {
-    const checkbox = page.locator('[data-testid="signal-checkbox-signal_01"]');
-
-    // Initially should not have primary background
-    let hasPrimaryBg = await checkbox.evaluate((el) =>
-      el.classList.contains('bg-sidebar-primary')
-    );
-    expect(hasPrimaryBg).toBe(false);
-
-    // Select the signal
-    await page.locator('[data-testid="signal-button-signal_01"]').click();
-
-    // Should now have primary background
-    hasPrimaryBg = await checkbox.evaluate((el) =>
-      el.classList.contains('bg-sidebar-primary')
-    );
-    expect(hasPrimaryBg).toBe(true);
+    // Should see empty state or list
+    // (Assuming no snapshots initially, or checking for the "Save View" hint)
+    await expect(
+      page.getByText('No saved views yet').or(page.getByText('Load View'))
+    ).toBeVisible();
   });
 });

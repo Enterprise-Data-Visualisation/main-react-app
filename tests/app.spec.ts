@@ -16,12 +16,12 @@ test.describe('App Layout', () => {
 
     // Verify sidebar CSS properties
     const sidebarBox = await sidebar.boundingBox();
-    expect(sidebarBox?.width).toBe(256); // w-64 = 16rem = 256px
+    expect(sidebarBox?.width).toBe(320); // w-80 = 20rem = 320px
 
-    // App title should be visible
-    const appTitle = page.locator('[data-testid="app-title"]');
-    await expect(appTitle).toBeVisible();
-    await expect(appTitle).toHaveText('MTSS Monitor');
+    // App title is now part of sidebar header
+    const sidebarHeader = page.locator('[data-testid="sidebar-header"]');
+    await expect(sidebarHeader).toBeVisible();
+    await expect(sidebarHeader).toContainText('MTSS Monitor');
 
     // Header should be visible
     const header = page.locator('[data-testid="header"]');
