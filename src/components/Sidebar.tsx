@@ -27,14 +27,14 @@ interface SidebarProps {
   readonly onToggleSignal: (id: string) => void;
 }
 
-// Helper for GraphQL Fetch
-const GRAPHQL_ENDPOINT = 'http://localhost:4001';
+import { config } from '../config';
 
+// Helper for GraphQL Fetch
 async function fetchGraphQL(
   query: string,
   variables: Record<string, unknown> = {}
 ) {
-  const response = await fetch(GRAPHQL_ENDPOINT, {
+  const response = await fetch(config.GRAPHQL_ENDPOINT, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query, variables }),

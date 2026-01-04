@@ -13,13 +13,13 @@ interface HeaderProps {
 }
 
 // Helper for GraphQL Fetch (Duplicate for now)
-const GRAPHQL_ENDPOINT = 'http://localhost:4001';
+import { config } from '../config';
 
 async function fetchGraphQL(
   query: string,
   variables: Record<string, unknown> = {}
 ) {
-  const response = await fetch(GRAPHQL_ENDPOINT, {
+  const response = await fetch(config.GRAPHQL_ENDPOINT, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query, variables }),
@@ -119,9 +119,8 @@ export function Header({
 
         <span
           data-testid="live-status"
-          className={`text-sm font-medium ${
-            isLive ? 'text-destructive' : 'text-muted-foreground'
-          }`}
+          className={`text-sm font-medium ${isLive ? 'text-destructive' : 'text-muted-foreground'
+            }`}
         >
           {isLive ? 'Live Stream' : 'Historical'}
         </span>

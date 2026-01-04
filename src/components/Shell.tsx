@@ -12,15 +12,14 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Timer, List, Activity } from 'lucide-react';
 import { ChartArea } from './ChartArea';
 import type { Signal } from '../types';
+import { config } from '../config';
 
 // Helper for GraphQL Fetch (Duplicate of Sidebar, could be a shared util)
-const GRAPHQL_ENDPOINT = 'http://localhost:4001';
-
 async function fetchGraphQL(
   query: string,
   variables: Record<string, unknown> = {}
 ) {
-  const response = await fetch(GRAPHQL_ENDPOINT, {
+  const response = await fetch(config.GRAPHQL_ENDPOINT, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query, variables }),
@@ -134,7 +133,7 @@ function ShellContent() {
   const { themeName, theme } = useTheme();
 
   // Use environment variable for Dash URL (dev vs prod)
-  const baseUrl = import.meta.env.VITE_DASH_URL || 'http://127.0.0.1:8050';
+  const baseUrl = config.DASH_URL;
   const tzOffset = new Date().getTimezoneOffset();
   const dashUrl = `${baseUrl}/?signal_id=${signalsParam}&signals=${encodeURIComponent(
     JSON.stringify(signalsMetadata)
